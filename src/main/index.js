@@ -1,25 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
 import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import ListIcon from "@material-ui/icons/ArtTrack";
-import AddIcon from "@material-ui/icons/Add";
-import IconButton from "@material-ui/core/IconButton";
-import AccountCircle from "@material-ui/icons/AccountCircle";
-import AddDevice from "./add-device";
+import Switch from "@material-ui/core/Switch";
 import Devices from "./devices";
 import logo from "../logo.svg";
-import * as enums from "../core/constants";
-
-const drawerWidth = 240;
+import Console from "./console";
 
 const styles = theme => ({
   root: {
@@ -27,8 +15,7 @@ const styles = theme => ({
     height: "100%",
     zIndex: 1,
     overflow: "hidden",
-    position: "relative",
-    display: "flex"
+    position: "relative"
   },
   logo: {
     width: 50,
@@ -38,17 +25,33 @@ const styles = theme => ({
     zIndex: theme.zIndex.drawer + 1,
     backgroundColor: "black"
   },
-  drawerPaper: {
-    position: "relative",
-    width: drawerWidth
+  contentContainer: {
+    marginTop: theme.spacing.unit * 8,
+    padding: theme.spacing.unit * 2
   },
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing.unit * 3,
-    minWidth: 0 // So the Typography noWrap works
+    minWidth: 0, // So the Typography noWrap works,
+    display: "flex"
   },
-  toolbar: theme.mixins.toolbar
+  group: {
+    flexGrow: 1,
+    padding: 10
+  },
+  title: {
+    marginBottom: theme.spacing.unit,
+    fontWeight: "bold",
+    padding: theme.spacing.unit
+  },
+  control: {
+    display: "flex",
+    justifyContent: "flex-end"
+  },
+  toggleButton: {
+    padding: theme.spacing.unit,
+    minHeight: 0
+  }
 });
 
 class Main extends React.Component {
@@ -56,24 +59,20 @@ class Main extends React.Component {
     super(props);
 
     this.state = {
-      view: enums.VIEW.DEVICES
+      appiumProxyOn: false,
+      selectedDeviceUDID: null
     };
 
-    this._switchToDeviceList = this._switchToDeviceList.bind(this)
-    this._switchToAddDevice = this._switchToAddDevice.bind(this)
+    this._toggleAppiumProxy = this._toggleAppiumProxy.bind(this);
   }
 
-  _switchToDeviceList() {
-    this.setState({ view: enums.VIEW.DEVICES })
-  }
-
-  _switchToAddDevice() {
-    this.setState({ view: enums.VIEW.ADD_DEVICE })
+  _toggleAppiumProxy() {
+    this.setState({ appiumProxyOn: !this.state.appiumProxyOn });
   }
 
   render() {
     const { classes } = this.props;
-    const { view } = this.state;
+    const { selectedDeviceUDID } = this.state;
     return (
       <div className={classes.root}>
         <AppBar position="absolute" className={classes.appBar}>
@@ -87,34 +86,28 @@ class Main extends React.Component {
             </IconButton> */}
           </Toolbar>
         </AppBar>
-        <Drawer
-          variant="permanent"
-          classes={{
-            paper: classes.drawerPaper
-          }}
-        >
-          <div className={classes.toolbar} />
-          <List>
-            <ListItem button onClick={this._switchToDeviceList}>
-              <ListItemIcon>
-                <ListIcon />
-              </ListItemIcon>
-              <ListItemText inset primary="DEVICES" />
-            </ListItem>
-          </List>
-          <Divider />
-          <List>
-            <ListItem button onClick={this._switchToAddDevice}>
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-              <ListItemText inset primary="ADD DEVICE" />
-            </ListItem>
-          </List>
-        </Drawer>
-        <main className={classes.content}>
-          <div className={classes.toolbar} />
-          {view === enums.VIEW.DEVICES ? <Devices /> : <AddDevice />}
+        <main className={classes.contentContainer}>
+          {/* <div className={classes.control}>
+            <Typography variant="title" className={classes.title}>
+              APPIUM PROXY
+            </Typography>
+            <Switch
+              checked={this.state.appiumProxyOn}
+              onChange={this._toggleAppiumProxy}
+              value="checkedA"
+            />
+          </div> */}
+          <div className={classes.content}>
+            <div className={classes.group}>
+              <Typography variant="title" className={classes.title}>
+                DEVICES
+              </Typography>
+              <Devices />
+            </div>
+            <div className={classes.group} style={{ display: "flex" }}>
+              <Console />
+            </div>
+          </div>
         </main>
       </div>
     );

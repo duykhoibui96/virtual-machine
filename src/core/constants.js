@@ -21,3 +21,9 @@ export const PLATFORM = {
   IOS: "iOS",
   ANDROID: "Android"
 };
+
+export const LOG_TYPES = keyMirror({
+  LOG: null,
+  ERROR: null,
+  WARNING: null
+})

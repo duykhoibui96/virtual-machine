@@ -8,6 +8,7 @@ class Api {
   constructor() {
     this._token = TOKEN;
     this._baseUrl = API_URL;
+    this.send = this.send.bind(this)
   }
 
   async send(url, method, data) {

@@ -1,11 +1,18 @@
 import React, { Component } from "react";
 import "./App.css";
 import { Provider } from "react-redux";
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
 import reducer from "./core/reducers";
 import Main from "./main";
+import middleware from "./core/middlewares";
+import createSagaMiddleware from "redux-saga";
+import logger from "redux-logger";
 
-const store = createStore(reducer);
+const sagaMiddleware = createSagaMiddleware()
+
+const store = createStore(reducer, applyMiddleware(sagaMiddleware, logger));
+
+sagaMiddleware.run(middleware)
 
 class App extends Component {
   render() {

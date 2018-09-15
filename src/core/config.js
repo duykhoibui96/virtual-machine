@@ -7,4 +7,4 @@ export const ANDROID_IMAGE_URI =
 export const API_KEY = process.env.API_KEY || null;
 export const USERNAME = process.env.USERNAME || null;
 export const TOKEN = process.env.TOKEN || null;
-export const API_URL = process.env.API_URL || null;
+export const API_URL = process.env.API_URL || 'http://localhost:3000/v1';

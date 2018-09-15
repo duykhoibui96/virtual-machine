@@ -21,3 +21,9 @@ export const PLATFORM = {
   IOS: "iOS",
   ANDROID: "Android"
 };
+
+export const DATA_STATES = keyMirror({
+  LOADING: null,
+  LOADED: null,
+  ERROR: null
+})

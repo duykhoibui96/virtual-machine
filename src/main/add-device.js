@@ -12,7 +12,7 @@ import Button from "@material-ui/core/Button";
 import * as enums from "../core/constants";
 import { IPHONE_IMAGE_URI, ANDROID_IMAGE_URI } from "../core/config";
 import { connect } from "react-redux";
-import { addDevice } from "../core/services/device";
+import { addDevice } from "./actions";
 
 const styles = theme => ({
   phoneImage: {

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+import classnames from "classnames";
 import { IPHONE_IMAGE_URI, ANDROID_IMAGE_URI } from "../core/config";
 import * as enums from "../core/constants";
 
@@ -98,7 +99,7 @@ class Device extends React.Component {
             <Button
               variant="contained"
               onClick={this._removeDevice}
-              className={[classes.button, classes.remove]}
+              className={classnames(classes.button, classes.remove)}
             >
               REMOVE
             </Button>

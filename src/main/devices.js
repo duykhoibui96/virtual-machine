@@ -3,17 +3,22 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Device from "./device";
-import Input from "@material-ui/core/Input";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import SearchIcon from "@material-ui/icons/Search";
 import Typography from "@material-ui/core/Typography";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import ConfirmDialog from "../core/components/confirm";
-import { removeDevice } from "../core/services/device";
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Button from '@material-ui/core/Button';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Checkbox from '@material-ui/core/Checkbox';
+import MenuItem from '@material-ui/core/MenuItem';
+import { removeDevice } from "./actions";
+import * as enums from "../core/constants"
 
 const styles = theme => ({
   root: {
-    borderRadius: 10
+    borderRadius: 10,
+    height: '100%'
   },
   buttonGroup: {
     marginBottom: 10,
@@ -22,6 +27,14 @@ const styles = theme => ({
   },
   searchField: {
     marginBottom: 20
+  },
+  button: {
+    margin: theme.spacing.unit * 2
+  },
+  control: {
+    marginVertical: theme.spacing.unit * 2,
+    display: "flex",
+    justifyContent: "space-between",
   }
 });
 
@@ -30,15 +43,12 @@ class Devices extends React.Component {
     super(props);
 
     this.state = {
-      searchKey: "",
-      removingDeviceUdid: null,
-      isConfirmingRemoving: false
+      searchKey: ""
     };
 
     this._search = this._search.bind(this);
-    this._preRemoveDevice = this._preRemoveDevice.bind(this);
     this._removeDevice = this._removeDevice.bind(this);
-    this._cancelRemoveDevice = this._cancelRemoveDevice.bind(this);
+    this._renderDevices = this._renderDevices.bind(this);
   }
 
   _search(e) {
@@ -47,80 +57,21 @@ class Devices extends React.Component {
     });
   }
 
-  _openConfirmationDialog() {
-    this.setState({
-      isConfirmingRemoving: true
-    });
-  }
-
-  _closeConfirmatioDialog() {
-    this.setState({
-      isConfirmingRemoving: false
-    });
-  }
-
-  _preRemoveDevice(udid) {
-    this.setState({
-      removingDeviceUdid: udid
-    });
-    this._openConfirmationDialog();
-  }
-
-  _removeDevice() {
+  _removeDevice(udid) {
     const { removeDevice } = this.props;
-    this._closeConfirmatioDialog();
-    removeDevice(this.state.removingDeviceUdid);
-    setTimeout(
-      () =>
-        this.setState({
-          removingDeviceUdid: null
-        }),
-      100
-    );
+    const willRemove = window.confirm(`Are your sure to remove this device (udid = '${udid}') ?`)
+    if (willRemove)
+      removeDevice(this.state.removingDeviceUdid);
   }
 
-  _cancelRemoveDevice() {
-    this._closeConfirmatioDialog();
-    setTimeout(
-      () =>
-        this.setState({
-          removingDeviceUdid: null
-        }),
-      100
-    );
-  }
-
-  render() {
-    const { classes, devices } = this.props;
-    return (
-      <div className={classes.root}>
-        <ConfirmDialog
-          mainText="Removing device"
-          extraText={`Device with udid '${
-            this.state.removingDeviceUdid
-          }' will be removed. Continue?`}
-          open={this.state.isConfirmingRemoving}
-          handleCloseWithAgree={this._removeDevice}
-          handleCloseWithDisagree={this._cancelRemoveDevice}
-        />
-        <Typography variant="title" gutterBottom>
-          DEVICE LIST
-        </Typography>
-        <CssBaseline />
-        <Input
-          className={classes.searchField}
-          fullWidth
-          placeholder="Search your phone"
-          onChange={this._search}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            )
-          }}
-        />
-        {devices
+  _renderDevices() {
+    const { devices, state, classes } = this.props;
+    let filteredDevices
+    switch (state) {
+      case enums.DATA_STATES.LOADING:
+        return <LinearProgress variant="query" />
+      default:
+        filteredDevices = devices
           .filter(device => {
             const { searchKey } = this.state;
             if (searchKey === "") return true;
@@ -129,13 +80,75 @@ class Devices extends React.Component {
               device.udid.includes(searchKey)
             );
           })
-          .map((device, index) => (
-            <Device
-              key={`device-${index}`}
-              device={device}
-              requestRemoving={this._preRemoveDevice}
-            />
-          ))}
+          .slice(0, 10)
+    }
+    return (
+      filteredDevices.length > 0 ?
+        <div>
+          <div className={classes.control}>
+            <FormGroup row style={{ flexGrow: 3 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={true}
+                    value="isOnline"
+                    color="primary"
+                  />
+                }
+                label="Online"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={true}
+                    value="isBooked"
+                  />
+                }
+                label="Booked"
+              />
+            </FormGroup>
+            <FormControl style={{ flexGrow: 1 }}>
+              <Select
+                value="all"
+                inputProps={{
+                  name: 'deviceType',
+                  id: 'device-type',
+                }}
+              >
+                <MenuItem value="all">
+                  ALL DEVICES
+                </MenuItem>
+                <MenuItem value="private">PRIVATE DEVICES</MenuItem>
+                <MenuItem value="cloud">CLOUD DEVICES</MenuItem>
+                <MenuItem value="org">ORG DEVICES</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
+          {
+            filteredDevices.map((device, index) => (
+              <Device
+                key={`device-${index}`}
+                device={device}
+                requestRemoving={this._removeDevice}
+              />
+            ))
+          }
+        </div>
+        :
+        <Typography variant="notify" gutterBottom style={{ alignContent: 'center' }}>
+          NO DEVICES
+      </Typography>
+    )
+  }
+
+  render() {
+    const { classes } = this.props;
+    return (
+      <div className={classes.root}>
+        <Button variant="contained" color="secondary" className={classes.button} style={{ marginLeft: 0 }}>
+          + ADD NEW DEVICE
+        </Button>
+        {this._renderDevices()}
       </div>
     );
   }
@@ -147,8 +160,8 @@ Devices.propTypes = {
 
 export default withStyles(styles)(
   connect(
-    state => ({
-      devices: state.device.devices
+    ({ device }) => ({
+      ...device
     }),
     dispatch => ({
       removeDevice: udid => dispatch(removeDevice(udid))

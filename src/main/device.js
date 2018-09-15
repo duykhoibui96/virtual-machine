@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
+<<<<<<< HEAD
 import { connect } from "react-redux";
+=======
+import classnames from "classnames";
+>>>>>>> bd2d8e32b2eea7b789b2307f24acfe4800b75eb1
 import { IPHONE_IMAGE_URI, ANDROID_IMAGE_URI } from "../core/config";
 import * as enums from "../core/constants";
 import { plugDevice, unplugDevice } from "../core/actions/device";

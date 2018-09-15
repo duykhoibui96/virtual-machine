@@ -75,15 +75,12 @@ class Main extends React.Component {
     const { selectedDeviceUDID } = this.state;
     return (
       <div className={classes.root}>
-        <AppBar position="absolute" className={classes.appBar}>
+        <AppBar position="static" color="default" className={classes.appBar}>
           <Toolbar>
-            <img src={logo} className={classes.logo} alt="logo" />
-            <Typography variant="title" color="inherit" noWrap>
-              VIRTUAL DEVICE LAB
+            <img src={logo} className={classes.logo} />
+            <Typography variant="headline" color="inherit">
+              DEVICE LAB MANAGEMENT
             </Typography>
-            {/* <IconButton aria-haspopup="true" color="inherit">
-              <AccountCircle />
-            </IconButton> */}
           </Toolbar>
         </AppBar>
         <main className={classes.contentContainer}>
@@ -118,4 +115,11 @@ Main.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(Main);
+export default withStyles(styles)(
+  connect(
+    () => ({}),
+    dispatch => ({
+      loadDevices: () => dispatch(loadDevices())
+    })
+  )(Main)
+);

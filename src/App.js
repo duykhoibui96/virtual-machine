@@ -3,6 +3,7 @@ import "./App.css";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import reducer from "./core/reducers";
+import middleware from "./core/middleware";
 import Main from "./main";
 import middleware from "./core/middlewares";
 import createSagaMiddleware from "redux-saga";

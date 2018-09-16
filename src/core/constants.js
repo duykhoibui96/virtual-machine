@@ -1,8 +1,8 @@
 import keyMirror from "keymirror";
 
 export const DEVICE_STATES = keyMirror({
-  UNPLUGGED: null,
-  UNPLUGGING: null,
+  DEACTIVATED: null,
+  DEACTIVATING: null,
   ACTIVATED: null,
   ACTIVATING: null
 });
@@ -22,3 +22,8 @@ export const LOG_TYPES = keyMirror({
   ERROR: null,
   WARNING: null
 });
+
+export const CONNECTION_TYPES = keyMirror({
+  CONTROL: null,
+  SESSION: null
+})

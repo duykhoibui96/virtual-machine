@@ -8,21 +8,21 @@ const initialState = [
     platformVersion: "4.4.1",
     deviceName: "IPhone X 64GB",
     udid: "ioqwejhjkahdflewfoahsdf",
-    state: enums.DEVICE_STATES.UNPLUGGED
+    state: enums.DEVICE_STATES.DEACTIVATED
   },
   {
     platformName: enums.PLATFORM.ANDROID,
     platformVersion: "3.2.1",
     deviceName: "Galaxy J7 PRO",
     udid: "752a6sdf26a6ef26asdf",
-    state: enums.DEVICE_STATES.UNPLUGGED
+    state: enums.DEVICE_STATES.DEACTIVATED
   },
   {
     platformName: enums.PLATFORM.IOS,
     platformVersion: "5.1",
     deviceName: "IPhone X Plus 64GB",
     udid: "365wefqafasdfasdfasdf",
-    state: enums.DEVICE_STATES.UNPLUGGED
+    state: enums.DEVICE_STATES.DEACTIVATED
   }
 ];
 

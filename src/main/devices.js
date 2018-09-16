@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Device from "./device";
 import CssBaseline from "@material-ui/core/CssBaseline";
+import { updateStatus } from "../core/actions/device";
 
 const styles = theme => ({
   root: {},
@@ -26,23 +27,8 @@ const styles = theme => ({
 });
 
 class Devices extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this._removeDevice = this._removeDevice.bind(this);
-    this._selectDevice = this._selectDevice.bind(this);
-  }
-
-  _removeDevice(udid) {
-    alert("This feature is not available");
-  }
-
-  _selectDevice(udid) {
-    this.props.selectDevice(udid);
-  }
-
   render() {
-    const { classes, devices } = this.props;
+    const { classes, devices, updateStatus } = this.props;
     return (
       <div className={classes.root}>
         <CssBaseline />
@@ -50,7 +36,7 @@ class Devices extends React.Component {
           <Device
             key={`device-${index}-${Date.now()}`}
             device={device}
-            requestRemoving={this._removeDevice}
+            updateStatus={updateStatus}
           />
         ))}
       </div>
@@ -66,6 +52,9 @@ export default withStyles(styles)(
   connect(
     ({ device }) => ({
       devices: device
+    }),
+    dispatch => ({
+      updateStatus: (udid, status) => dispatch(updateStatus(udid, status))
     })
   )(Devices)
 );

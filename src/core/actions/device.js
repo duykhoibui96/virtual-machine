@@ -1,6 +1,5 @@
 import { createAction } from "redux-actions";
 import keyMirror from "keymirror";
-import * as enums from "../constants";
 
 export const actionKeys = keyMirror({
   LOAD_DEVICES: null,

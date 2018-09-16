@@ -3,11 +3,8 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
-import { connect } from "react-redux";
-import classnames from "classnames";
 import { IPHONE_IMAGE_URI, ANDROID_IMAGE_URI } from "../core/config";
 import * as enums from "../core/constants";
-import { updateStatus } from "../core/actions/device";
 
 const styles = theme => ({
   root: {
@@ -66,39 +63,30 @@ class Device extends React.Component {
   constructor(props) {
     super(props);
 
-    this._removeDevice = this._removeDevice.bind(this);
-    this._updateStatus = this._updateStatus.bind(this);
     this._getText = this._getText.bind(this);
-  }
-
-  _removeDevice() {
-    const { device, requestRemoving } = this.props;
-    requestRemoving(device.udid);
+    this._updateStatus = this._updateStatus.bind(this);
   }
 
   _updateStatus() {
-    const { device, plugDevice, unplugDevice } = this.props;
-    switch (device.state) {
-      case enums.DEVICE_STATES.UNPLUGGED:
-        plugDevice(device.udid);
-        break;
-      case enums.DEVICE_STATES.ACTIVATED:
-        unplugDevice(device.udid);
-        break;
+    const { device, updateStatus } = this.props;
+    let status = enums.DEVICE_STATES.ACTIVATING;
+    if (device.state === enums.DEVICE_STATES.ACTIVATED) {
+      status = enums.DEVICE_STATES.DEACTIVATING;
     }
+    updateStatus(device.udid, status);
   }
 
   _getText() {
     const { device } = this.props;
     switch (device.state) {
-      case enums.DEVICE_STATES.UNPLUGGING:
-        return "UNPLUGGING ...";
+      case enums.DEVICE_STATES.DEACTIVATING:
+        return "DEACTIVATING ...";
       case enums.DEVICE_STATES.ACTIVATING:
-        return "PLUGGING ...";
-      case enums.DEVICE_STATES.UNPLUGGED:
-        return "PLUG";
+        return "ACTIVATING ...";
+      case enums.DEVICE_STATES.DEACTIVATED:
+        return "ACTIVATE";
       case enums.DEVICE_STATES.ACTIVATED:
-        return "UNPLUG";
+        return "DEACTIVATE";
     }
   }
 
@@ -134,7 +122,7 @@ class Device extends React.Component {
                   : "primary"
               }
               disabled={
-                device.state === enums.DEVICE_STATES.UNPLUGGING ||
+                device.state === enums.DEVICE_STATES.DEACTIVATING ||
                 device.state === enums.DEVICE_STATES.ACTIVATING
               }
               className={classes.button}
@@ -151,18 +139,7 @@ class Device extends React.Component {
 
 Device.propTypes = {
   classes: PropTypes.object.isRequired,
-  device: PropTypes.object.isRequired,
-  requestRemoving: PropTypes.func.isRequired
+  device: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(
-  connect(
-    null,
-    dispatch => ({
-      plugDevice: udid =>
-        dispatch(updateStatus(udid, enums.DEVICE_STATES.ACTIVATING)),
-      unplugDevice: udid =>
-        dispatch(updateStatus(udid, enums.DEVICE_STATES.UNPLUGGING))
-    })
-  )(Device)
-);
+export default withStyles(styles)(Device);

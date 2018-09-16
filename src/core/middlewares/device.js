@@ -23,13 +23,13 @@ function* updateDeviceStatus(action) {
   const { payload } = action;
   let notify, nextAction;
   switch (payload.state) {
-    case enums.DEVICE_STATES.UNPLUGGED:
-      notify = "Unlugged device ";
+    case enums.DEVICE_STATES.DEACTIVATED:
+      notify = "Deactivated device ";
       break;
-    case enums.DEVICE_STATES.UNPLUGGING:
-      notify = "Unplugging device ";
+    case enums.DEVICE_STATES.DEACTIVATING:
+      notify = "Deactivating device ";
       nextAction = put(
-        updateStatus(payload.udid, enums.DEVICE_STATES.UNPLUGGED)
+        updateStatus(payload.udid, enums.DEVICE_STATES.DEACTIVATED)
       );
       break;
     case enums.DEVICE_STATES.ACTIVATING:

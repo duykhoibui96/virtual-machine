@@ -1,4 +1,4 @@
-import { setDevices, plugDevice, unplugDevice } from "../actions/device";
+import { setDevices, updateStatus } from "../actions/device";
 import { handleActions, combineActions } from "redux-actions";
 import * as enums from "../constants"
 
@@ -29,7 +29,7 @@ const initialState = [
 export default handleActions(
   {
     [setDevices]: (state, { payload: { devices } }) => ({ devices }),
-    [combineActions(plugDevice, unplugDevice)]: (state, {payload: { udid, state: deviceState }}) => {
+    [updateStatus]: (state, {payload: { udid, state: deviceState }}) => {
       const deviceIndex = state.findIndex(d => d.udid === udid)
       if (deviceIndex >= 0) {
         const newDeviceList = state.slice()

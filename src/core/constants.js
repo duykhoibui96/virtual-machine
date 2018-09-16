@@ -2,14 +2,9 @@ import keyMirror from "keymirror";
 
 export const DEVICE_STATES = keyMirror({
   UNPLUGGED: null,
-  PLUGGED: null,
-  READY: null,
-  ACTIVATING: null,
+  UNPLUGGING: null,
   ACTIVATED: null,
-  UTILIZING: null,
-  DEACTIVATING: null,
-  DEACTIVATED: null,
-  ERROR: null
+  ACTIVATING: null
 });
 
 export const VIEW = keyMirror({
@@ -26,4 +21,4 @@ export const LOG_TYPES = keyMirror({
   LOG: null,
   ERROR: null,
   WARNING: null
-})
+});

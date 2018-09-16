@@ -3,14 +3,11 @@ import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
-<<<<<<< HEAD
 import { connect } from "react-redux";
-=======
 import classnames from "classnames";
->>>>>>> bd2d8e32b2eea7b789b2307f24acfe4800b75eb1
 import { IPHONE_IMAGE_URI, ANDROID_IMAGE_URI } from "../core/config";
 import * as enums from "../core/constants";
-import { plugDevice, unplugDevice } from "../core/actions/device";
+import { updateStatus } from "../core/actions/device";
 
 const styles = theme => ({
   root: {
@@ -59,6 +56,9 @@ const styles = theme => ({
     marginTop: 10,
     color: "rgba(0,0,0,0.7)",
     display: "block"
+  },
+  status: {
+    color: "gray"
   }
 });
 
@@ -67,8 +67,8 @@ class Device extends React.Component {
     super(props);
 
     this._removeDevice = this._removeDevice.bind(this);
-    this._plug = this._plug.bind(this);
-    this._unplug = this._unplug.bind(this);
+    this._updateStatus = this._updateStatus.bind(this);
+    this._getText = this._getText.bind(this);
   }
 
   _removeDevice() {
@@ -76,12 +76,30 @@ class Device extends React.Component {
     requestRemoving(device.udid);
   }
 
-  _plug() {
-    this.props.plugDevice(this.props.device.udid);
+  _updateStatus() {
+    const { device, plugDevice, unplugDevice } = this.props;
+    switch (device.state) {
+      case enums.DEVICE_STATES.UNPLUGGED:
+        plugDevice(device.udid);
+        break;
+      case enums.DEVICE_STATES.ACTIVATED:
+        unplugDevice(device.udid);
+        break;
+    }
   }
 
-  _unplug() {
-    this.props.unplugDevice(this.props.device.udid);
+  _getText() {
+    const { device } = this.props;
+    switch (device.state) {
+      case enums.DEVICE_STATES.UNPLUGGING:
+        return "UNPLUGGING ...";
+      case enums.DEVICE_STATES.ACTIVATING:
+        return "PLUGGING ...";
+      case enums.DEVICE_STATES.UNPLUGGED:
+        return "PLUG";
+      case enums.DEVICE_STATES.ACTIVATED:
+        return "UNPLUG";
+    }
   }
 
   render() {
@@ -99,7 +117,7 @@ class Device extends React.Component {
               className={classes.phoneImage}
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={5}>
             <h2 className={classes.deviceName}>{device.deviceName}</h2>
             <p className={classes.deviceInfo}>
               {device.platformName === enums.PLATFORM.IOS ? "iOS" : "Android"}{" "}
@@ -107,26 +125,23 @@ class Device extends React.Component {
             </p>
             <p className={classes.deviceInfo}>UDID: {device.udid}</p>
           </Grid>
-          <Grid item xs={3}>
-            {device.state === enums.DEVICE_STATES.PLUGGED ? (
-              <Button
-                variant="contained"
-                color="secondary"
-                className={classes.button}
-                onClick={this._unplug}
-              >
-                UNPLUG
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.button}
-                onClick={this._plug}
-              >
-                PLUG
-              </Button>
-            )}
+          <Grid item xs={4} style={{ textAlign: "center" }}>
+            <Button
+              variant="contained"
+              color={
+                device.state === enums.DEVICE_STATES.ACTIVATED
+                  ? "secondary"
+                  : "primary"
+              }
+              disabled={
+                device.state === enums.DEVICE_STATES.UNPLUGGING ||
+                device.state === enums.DEVICE_STATES.ACTIVATING
+              }
+              className={classes.button}
+              onClick={this._updateStatus}
+            >
+              {this._getText()}
+            </Button>
           </Grid>
         </Grid>
       </div>
@@ -144,8 +159,10 @@ export default withStyles(styles)(
   connect(
     null,
     dispatch => ({
-      plugDevice: udid => dispatch(plugDevice(udid)),
-      unplugDevice: udid => dispatch(unplugDevice(udid))
+      plugDevice: udid =>
+        dispatch(updateStatus(udid, enums.DEVICE_STATES.ACTIVATING)),
+      unplugDevice: udid =>
+        dispatch(updateStatus(udid, enums.DEVICE_STATES.UNPLUGGING))
     })
   )(Device)
 );

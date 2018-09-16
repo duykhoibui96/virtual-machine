@@ -3,11 +3,14 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
+import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Switch from "@material-ui/core/Switch";
 import Devices from "./devices";
 import logo from "../logo.svg";
 import Console from "./console";
+import { loadDevices } from "../core/actions/device";
+import { connect } from "react-redux";
 
 const styles = theme => ({
   root: {
@@ -23,7 +26,10 @@ const styles = theme => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    backgroundColor: "black"
+    backgroundColor: "black",
+    color: 'white',
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2
   },
   contentContainer: {
     marginTop: theme.spacing.unit * 8,
@@ -33,11 +39,10 @@ const styles = theme => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     minWidth: 0, // So the Typography noWrap works,
-    display: "flex"
   },
   group: {
     flexGrow: 1,
-    padding: 10
+    padding: 10,
   },
   title: {
     marginBottom: theme.spacing.unit,
@@ -64,6 +69,10 @@ class Main extends React.Component {
     };
 
     this._toggleAppiumProxy = this._toggleAppiumProxy.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.loadDevices()
   }
 
   _toggleAppiumProxy() {
@@ -94,17 +103,17 @@ class Main extends React.Component {
               value="checkedA"
             />
           </div> */}
-          <div className={classes.content}>
-            <div className={classes.group}>
+          <Grid container className={classes.content}>
+            <Grid item xs={6} className={classes.group}>
               <Typography variant="title" className={classes.title}>
                 DEVICES
               </Typography>
               <Devices />
-            </div>
-            <div className={classes.group} style={{ display: "flex" }}>
+            </Grid>
+            <Grid item xs={6} className={classes.group} style={{ display: "flex" }}>
               <Console />
-            </div>
-          </div>
+            </Grid>
+          </Grid>
         </main>
       </div>
     );

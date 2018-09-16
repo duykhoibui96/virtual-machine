@@ -1,6 +1,7 @@
-import { call, put, takeEvery } from "redux-saga/effects";
-import { actionKeys, setDevices } from "../actions/device";
+import { call, put, takeEvery, delay } from "redux-saga/effects";
+import { actionKeys, updateStatus } from "../actions/device";
 import { printLog, printError } from "../actions/log";
+import * as enums from "../constants";
 import api from "../api";
 
 // worker Saga: will be fired on USER_FETCH_REQUESTED actions
@@ -14,15 +15,41 @@ function* fetchDevice(action) {
   }
 }
 
+function* informStatusToServer() {
+  yield new Promise(resolve => setTimeout(() => resolve(), 5000));
+}
+
 function* updateDeviceStatus(action) {
-  const { payload } = action
-  yield put(
-    printLog(
-      `${action.type === actionKeys.PLUG_DEVICE ? "Plug" : "Unplug"} device ${
-        payload.udid
-      }`
-    )
-  );
+  const { payload } = action;
+  let notify, nextAction;
+  switch (payload.state) {
+    case enums.DEVICE_STATES.UNPLUGGED:
+      notify = "Unlugged device ";
+      break;
+    case enums.DEVICE_STATES.UNPLUGGING:
+      notify = "Unplugging device ";
+      nextAction = put(
+        updateStatus(payload.udid, enums.DEVICE_STATES.UNPLUGGED)
+      );
+      break;
+    case enums.DEVICE_STATES.ACTIVATING:
+      notify = "Activating device ";
+      nextAction = put(
+        updateStatus(payload.udid, enums.DEVICE_STATES.ACTIVATED)
+      );
+      break;
+    case enums.DEVICE_STATES.ACTIVATED:
+      notify = "Activated device ";
+      break;
+    default:
+      notify = "Unknown command on device ";
+  }
+
+  yield put(printLog(notify + payload.udid));
+  if (nextAction) {
+    yield call(informStatusToServer);
+    yield nextAction;
+  }
 }
 
 /*
@@ -31,8 +58,7 @@ function* updateDeviceStatus(action) {
 */
 function* loadDevices() {
   yield takeEvery(actionKeys.LOAD_DEVICES, fetchDevice);
-  yield takeEvery(actionKeys.PLUG_DEVICE, updateDeviceStatus);
-  yield takeEvery(actionKeys.UNPLUG_DEVICE, updateDeviceStatus);
+  yield takeEvery(actionKeys.UPDATE_DEVICE_STATUS, updateDeviceStatus);
 }
 
 export default loadDevices;

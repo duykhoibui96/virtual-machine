@@ -32,7 +32,6 @@ const styles = theme => ({
     paddingBottom: theme.spacing.unit * 2
   },
   contentContainer: {
-    marginTop: theme.spacing.unit * 8,
     padding: theme.spacing.unit * 2
   },
   content: {
